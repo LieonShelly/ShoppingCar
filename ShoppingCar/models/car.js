@@ -6,6 +6,7 @@ module.exports = function Car(oldCar) {
     this.add = function(item, id) {
         var storedItem = this.items[id];
         if (!storedItem) {
+            /// 使用id作为键， item作为值，进行存储
             storedItem = this.items[id] = { item: item, qty: 0, price: 0 };
         }
         storedItem.qty++;

@@ -17,14 +17,22 @@ router.get('/', function(req, res, next) {
 router.get('/add-to-car/:id', function(req, res, next) {
     var productId = req.params.id;
     var car = new Car(req.session.car ? req.session.car : {});
-    Product.findById(productId, function(err, result) {
+    Product.findById(productId, function(err, result) { /// 从数据库中找到对应的product
         if (err) {
             return res.redirect('/');
         }
-        car.add(result, productId);
-        req.session.car = car;
+        car.add(result, productId); /// 添加到购物车
+        req.session.car = car; /// 刷新session
         console.log(req.session.car);
         res.redirect('/');
     });
+});
+
+router.get('/shopping-car', function(req, res, next) {
+    if (!req.session.car) {
+        res.render('shop/shopping-car', { products: null });
+    }
+    var car = new Car(req.session.car);
+    res.render('shop/shopping-car', { products: car.generateArray(), totalPrice: car.totalPrice });
 });
 module.exports = router;
