@@ -5,7 +5,6 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
-var session = require('express-session');
 var index = require('./routes/index');
 var user = require('./routes/user');
 var expresshbs = require('express-handlebars');
@@ -14,6 +13,8 @@ var app = express();
 var passport = require('passport');
 var flash = require('connect-flash');
 var validator = require('express-validator');
+var session = require('express-session');
+var MongoStore = require('connect-mongo')(session);
 require('./config/passport');
 
 mongoose.connect('localhost:27017/shopping');
@@ -28,14 +29,22 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(validator());
-app.use(session({ secret: 'meysecret', resave: true, saveUninitialized: false }))
+// 将session存储在mongod数据库中
+app.use(session({
+    secret: 'meysecret',
+    resave: true,
+    saveUninitialized: false,
+    store: new MongoStore({ mongooseConnection: mongoose.connection }),
+    cookie: { maxAge: 180 * 60 * 1000 }
+}));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(passport.initialize());
 app.use(flash());
 app.use(passport.session());
+// 没有挂载路径的中间件，应用的每个请求都会执行该中间件
 app.use(function(req, res, next) {
-    console.log("监视中的" + req.isAuthenticated());
     res.locals.logger = req.isAuthenticated();
+    res.locals.session = req.session;
     next();
 });
 app.use('/', index);

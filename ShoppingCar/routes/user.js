@@ -5,7 +5,7 @@ var csrfProtection = csrf();
 var passport = require('passport');
 router.use(csrfProtection);
 
-/// 使用use（中间件） 相当于 程序 一直在被执行，起个监视作用
+
 router.get('/profile', isLoggedIn, function(req, res) {
     res.render('users/profile');
 });
@@ -15,7 +15,10 @@ router.get('/logout', isLoggedIn, function(req, res, next) {
     req.logout();
     res.redirect('/'); // redirect方法与的路径与所在文件位置无关,相当于 请求 http:localhost
 });
-
+/**
+ * 中间件: 其作用是监视某个功能，程序一直在被执行
+ */
+/// 使用use（中间件） 相当于 程序 一直在被执行，起个监视作用
 /// 一直要监视所有是否被访问，如果被访问且没有登录，则执行next()(即执行下一步，不作出任何响应)
 router.use('/', notLoggedIn, function(req, res, next) {
     next();
