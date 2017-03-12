@@ -35,4 +35,11 @@ router.get('/shopping-car', function(req, res, next) {
     var car = new Car(req.session.car);
     res.render('shop/shopping-car', { products: car.generateArray(), totalPrice: car.totalPrice });
 });
+
+router.get('/checkout', function(req, res, next) {
+    if (!req.session.car) {
+        res.redirect('/hopping-car');
+    }
+    res.render('shop/checkout');
+});
 module.exports = router;
