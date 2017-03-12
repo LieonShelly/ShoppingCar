@@ -1,8 +1,10 @@
+console.log("执行了checkout.js");
 Stripe.setPublishableKey('pk_test_h7ZrNphsJD6i9aUzKk5yp14a');
 
 var $form = $('#checkout-form');
 
 $form.submit(function(event) {
+    $('#change-error').addClass('hidden');
     $form.find('button').prop('disabled', true);
     Stripe.card.createToken({
         number: $('#card-number').val(),
@@ -22,6 +24,7 @@ function stripeResponseHandler(status, response) {
     } else {
         var token = response.id;
         $form.append($('<input type="hidden" name="stripeToken" />').val(token));
+        console.log("执行了stripeToken");
         $form.get(0).submit();
     }
 }
