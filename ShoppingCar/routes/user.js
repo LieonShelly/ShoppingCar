@@ -44,17 +44,30 @@ router.get('/signin', function(req, res, next) {
 
 /// 注册 (在user.js文件中) <==> http:localhost/user/sign
 router.post('/signup', passport.authenticate('local-signup', {
-    successRedirect: '/user/profile', // redirect方法与的路径与所在文件位置无关，相当于发起get请求 http:localhost/user/profile
     failureRedirect: '/user/signup', // 相当于发起get请求 http:localhost/user/signup
     failureFlash: true
-}));
+}), function(req, res, next) {
+    if (req.session.oldUrl) {
+        res.redirect(req.session.oldUrl);
+        req.session.oldUrl = null;
+    } else {
+        res.redirect('/user/profile');
+    }
+});
 
 /// 登录(在user.js文件中) <==> http:localhost/user/signin
 router.post('/signin', passport.authenticate('local-signin', {
     successRedirect: '/user/profile',
     failureRedirect: '/user/signin',
     failureFlash: true
-}));
+}), function(req, res, next) {
+    if (req.session.oldUrl) {
+        res.redirect(req.session.oldUrl);
+        req.session.oldUrl = null;
+    } else {
+        res.redirect('/user/profile');
+    }
+});
 
 
 function isLoggedIn(req, res, next) {

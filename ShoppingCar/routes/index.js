@@ -41,7 +41,7 @@ router.get('/shopping-car', function(req, res, next) {
     res.render('shop/shopping-car', { products: car.generateArray(), totalPrice: car.totalPrice });
 });
 
-router.get('/checkout', function(req, res, next) {
+router.get('/checkout', isLoggedIn, function(req, res, next) {
     if (!req.session.car) {
         res.redirect('/shopping-car');
     }
@@ -49,7 +49,7 @@ router.get('/checkout', function(req, res, next) {
     res.render('shop/checkout', { total: req.session.car.totalPrice, errMsg: errMsg, noErrors: !errMsg });
 });
 
-router.post('/checkout', function(req, res, next) {
+router.post('/checkout', isLoggedIn, function(req, res, next) {
     if (!req.session.car) {
         res.redirect('/shopping-car');
     }
@@ -81,3 +81,12 @@ router.post('/checkout', function(req, res, next) {
     });
 });
 module.exports = router;
+
+function isLoggedIn(req, res, next) {
+    console.log("登录后的" + req.isAuthenticated());
+    if (req.isAuthenticated()) {
+        return next();
+    }
+    req.session.oldUrl = req.url;
+    res.redirect('/user/sign');
+}
