@@ -22,15 +22,32 @@ router.get('/', function(req, res, next) {
 router.get('/add-to-car/:id', function(req, res, next) {
     var productId = req.params.id;
     var car = new Car(req.session.car ? req.session.car : {});
-    Product.findById(productId, function(err, result) { /// 从数据库中找到对应的product
+    Product.findById(productId, function(err, result) {
         if (err) {
             return res.redirect('/');
         }
-        car.add(result, productId); /// 添加到购物车
-        req.session.car = car; /// 刷新session
+        car.add(result, productId);
+        req.session.car = car;
         console.log(req.session.car);
         res.redirect('/');
     });
+});
+
+router.get('/reduce/:id', function(req, res) {
+    var productId = req.params.id;
+    var car = new Car(req.session.car ? req.session.car : {});
+    car.reduceByOne(productId);
+    req.session.car = car;
+    res.redirect('/shopping-car');
+});
+
+router.get('/remove/:id', function(req, res) {
+    var productId = req.params.id;
+    var car = new Car(req.session.car ? req.session.car : {});
+    car.removeItem(productId);
+    req.session.car = car;
+    res.redirect('/shopping-car');
+    console.log(req.session.car.totalQty);
 });
 
 router.get('/shopping-car', function(req, res, next) {

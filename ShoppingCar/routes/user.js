@@ -3,11 +3,23 @@ var router = express.Router();
 var csrf = require('csurf');
 var csrfProtection = csrf();
 var passport = require('passport');
+var Order = require('../models/order');
+var Car = require('../models/car');
+
 router.use(csrfProtection);
 
-
 router.get('/profile', isLoggedIn, function(req, res) {
-    res.render('users/profile');
+    Order.find({ user: req.user }, function(err, result) {
+        if (err) {
+            return res.write('Error');
+        }
+        var car;
+        result.forEach(function(order) {
+            car = new Car(order.car);
+            order.items = car.generateArray();
+        });
+        res.render('users/profile', { orders: result });
+    });
 });
 
 /// 注销
